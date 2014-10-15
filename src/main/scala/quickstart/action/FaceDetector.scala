@@ -6,8 +6,12 @@ import org.opencv.objdetect.CascadeClassifier
 import xitrum.util.SeriDeseri
 import xitrum.{SockJsText, SockJsAction}
 import xitrum.annotation.SOCKJS
+import scala.collection.JavaConverters._
+import scala.language.postfixOps
 
 case class CaptureMessage(timestamp: Long, image: String)
+
+case class FacesMessage(timestamp: Long, faces: List[(Int, Int, Int, Int)])
 
 case class FramePartMessage(timestamp: Long, total: Int, part: Int, data: String)
 
@@ -35,13 +39,16 @@ class FaceDetector extends SockJsAction {
                     log.info(s"${png.width()}x${png.height()}")
                     val faceDetections = new MatOfRect()
                     faceDetector.detectMultiScale(png, faceDetections)
-                    faceDetections.toArray.foreach {
-                      case rect =>
-                        log.info(s"rect(${rect.x},${rect.y},${rect.width},${rect.height})")
-                        Core.rectangle(png, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(0, 255, 0))
-                    }
-                    Highgui.imencode(s".$mimetype", png, m)
-                    respondSockJsJson(CaptureMessage(ts, s"data:image/$mimetype;base64,${SeriDeseri.toBase64(m.toArray)}"))
+                    respondSockJsJson(FacesMessage(ts, faceDetections.toList.asScala.map {
+                      case rect => (rect.x, rect.y, rect.width, rect.height)
+                    } toList))
+//                    faceDetections.toArray.foreach {
+//                      case rect =>
+//                        log.info(s"rect(${rect.x},${rect.y},${rect.width},${rect.height})")
+//                        Core.rectangle(png, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(0, 255, 0))
+//                    }
+//                    Highgui.imencode(s".$mimetype", png, m)
+//                    respondSockJsJson(CaptureMessage(ts, s"data:image/$mimetype;base64,${SeriDeseri.toBase64(m.toArray)}"))
                   case _ =>
                 }
             }

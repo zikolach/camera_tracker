@@ -3,16 +3,12 @@ a {
   text-decoration: none;
 }
 
-video {
-    width: 640px;
-    height: 480px;
-}
-
 .hidden {
+    position: absolute;
     display: none;
 }
 
-canvas#o {
+.mirror {
     transform: rotateY(180deg);
     -webkit-transform:rotateY(180deg); /* Safari and Chrome */
     -moz-transform:rotateY(180deg); /* Firefox */
