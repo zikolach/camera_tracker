@@ -1,3 +1,5 @@
+import com.mojolly.scalate.ScalatePlugin.{Binding, ScalateKeys, TemplateConfig, _}
+
 name         := "cam-track"
 
 version      := "1.0-SNAPSHOT"
@@ -16,6 +18,7 @@ libraryDependencies += "tv.cntt" %% "xitrum" % "3.18"
 
 // Xitrum uses SLF4J, an implementation of SLF4J is needed
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.2"
+//libraryDependencies += "org.slf4j" % "slf4j-simple" % "1.7.7"
 
 // For writing condition in logback.xml
 libraryDependencies += "org.codehaus.janino" % "janino" % "2.7.5"
@@ -34,12 +37,12 @@ libraryDependencies ++= Seq(
 )
 
 // Precompile Scalate templates
-seq(scalateSettings:_*)
+Seq(scalateSettings:_*)
 
 ScalateKeys.scalateTemplateConfig in Compile := Seq(TemplateConfig(
   baseDirectory.value / "src" / "main" / "scalate",
   Seq(),
-  Seq(Binding("helper", "xitrum.Action", true))
+  Seq(Binding("helper", "xitrum.Action", importMembers = true))
 ))
 
 // xgettext i18n translation key string extractor is a compiler plugin ---------
@@ -53,10 +56,10 @@ scalacOptions += "-P:xgettext:xitrum.I18n"
 // Put config directory in classpath for easier development --------------------
 
 // For "sbt console"
-unmanagedClasspath in Compile <+= (baseDirectory) map { bd => Attributed.blank(bd / "config") }
+unmanagedClasspath in Compile <+= baseDirectory map { bd => Attributed.blank(bd / "config") }
 
 // For "sbt run"
-unmanagedClasspath in Runtime <+= (baseDirectory) map { bd => Attributed.blank(bd / "config") }
+unmanagedClasspath in Runtime <+= baseDirectory map { bd => Attributed.blank(bd / "config") }
 
 resourceDirectory in Compile <<= baseDirectory {_ / "src" / "main" / "resources"}
 
