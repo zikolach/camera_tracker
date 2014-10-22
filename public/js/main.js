@@ -18,7 +18,9 @@
             f = $('#fps'),
             capCtx = c.getContext('2d'),
             outCtx = o.getContext('2d'),
-            width = 0, height = 0, fps = 0, streaming = false, faces = [];
+            width = 0, height = 0, fps = 0, streaming = false,
+            faces = [], rects = [],
+            captureTimer = null;
 
         var adjustSize = function() {
             if (!streaming) {
@@ -47,14 +49,24 @@
                 capCtx.drawImage(v, 0, 0, width, height);
                 capCtx.beginPath();
                 _.each(faces, function(face) {
-                    capCtx.rect(face._1, face._2, face._3, face._4);
-                    console.log(face);
+                    capCtx.rect(face.x, face.y, face.w, face.h);
                 });
                 capCtx.strokeStyle = '#00ff00';
                 capCtx.stroke();
+                capCtx.beginPath();
+                _.each(rects, function(rect) {
+                    capCtx.moveTo(rect.a.x, rect.a.y);
+                    capCtx.lineTo(rect.b.x, rect.b.y);
+                    capCtx.lineTo(rect.c.x, rect.c.y);
+                    capCtx.lineTo(rect.d.x, rect.d.y);
+                    capCtx.lineTo(rect.a.x, rect.a.y);
+                });
+                capCtx.strokeStyle = '#ff0000';
+                capCtx.stroke();
             } catch (e) {
                 // firefox bug - component not available
-                setTimeout(captureImage, 1000);
+                clearTimeout(captureTimer);
+                captureTimer = setTimeout(captureImage, 1000);
             }
             var data = c.toDataURL("image/jpeg", 0.5);
             if (!!sock) {
@@ -74,13 +86,16 @@
                     outCtx.drawImage(img, 0, 0);
                     fps = Math.round(parseFloat(fps) * 0.9 + (1000 / (Date.now() - data.timestamp)) * 0.1);
                     f.text(fps);
-                    setTimeout(captureImage, 0);
+                    clearTimeout(captureTimer);
+                    captureTimer = setTimeout(captureImage, 0);
                 });
                 img.src = data.image;
             } else {
-                setTimeout(captureImage, 0);
+                clearTimeout(captureTimer);
+                captureTimer = setTimeout(captureImage, 0);
             }
             faces = data.faces || [];
+            rects = data.rects || [];
         };
 
         var connect = function() {
