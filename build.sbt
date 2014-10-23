@@ -10,7 +10,7 @@ scalaVersion := "2.11.2"
 scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked")
 
 // Xitrum requires Java 7
-javacOptions ++= Seq("-source", "1.7", "-target", "1.7")
+javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
 
 //------------------------------------------------------------------------------
 
@@ -33,7 +33,8 @@ libraryDependencies ++= Seq(
   "org.webjars" % "requirejs" % "2.1.14-3",
   "org.webjars" % "jquery" % "2.1.1",
   "org.webjars" % "underscorejs" % "1.7.0",
-  "org.webjars" % "sockjs-client" % "0.3.4"
+  "org.webjars" % "sockjs-client" % "0.3.4",
+  "org.webjars" % "angularjs" % "1.3.0"
 )
 
 // Precompile Scalate templates

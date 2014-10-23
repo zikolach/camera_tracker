@@ -17,6 +17,9 @@ html
         window.sockjsURL = '#{webJarsUrl("sockjs-client/0.3.4/sockjs.js")}';
         window.jqueryURL = '#{webJarsUrl("jquery/2.1.1/jquery.js")}';
         window.underscoreURL = '#{webJarsUrl("underscorejs/1.7.0/underscore.js")}';
+        window.angularjsURL = '#{webJarsUrl("angularjs/1.3.0/angular.js")}';
+        window.angularRouteURL = '#{webJarsUrl("angularjs/1.3.0/angular-route.js")}';
+        window.bootstrapURL = '#{webJarsUrl("bootstrap/3.2.0/js/bootstrap.js")}';
     script(src={webJarsUrl("requirejs/2.1.14-3", "require.js", "require.min.js")})
 
 
@@ -28,6 +31,12 @@ html
       #flash
         !~ jsRenderFlash()
       != renderedView
+
+      ul.menu
+        li
+          a(href="#/view1") view1
+
+      div(ng-view)
 
       script(src={publicUrl("js/main.js")})
 

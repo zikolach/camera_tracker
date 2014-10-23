@@ -5,8 +5,26 @@
         paths: {
             'sockjs': [window.sockjsURL],
             'jquery': [window.jqueryURL],
-            'underscore': [window.underscoreURL]
-        }
+            'underscore': [window.underscoreURL],
+            'angular': [window.angularjsURL],
+            'angular-route': [window.angularRouteURL],
+            'bootstrap': [window.bootstrapURL],
+            'app': '/js/app',
+            'routes': '/js/routes',
+            'controllers': '/js/controllers'
+        },
+        shim: {
+        	'angular' : {'exports' : 'angular'},
+        	'angular-route': ['angular'],
+        	shim: { "bootstrap": [ "jquery" ] }
+        },
+        priority: [
+            'angular'
+        ]
+    });
+
+    require(['angular', 'angular-route', 'app', 'routes'], function(angular) {
+        angular.bootstrap(document, ['myApp']);
     });
 
     require(['sockjs', 'jquery', 'underscore'], function(SockJS, $, _) {
@@ -94,8 +112,8 @@
                 clearTimeout(captureTimer);
                 captureTimer = setTimeout(captureImage, 0);
             }
-            faces = data.faces || [];
-            rects = data.rects || [];
+            faces = data.faces || faces;
+            rects = data.rects || rects;
         };
 
         var connect = function() {
