@@ -1,0 +1,24 @@
+<html>
+    <head>
+        <meta content="text/html; charset=utf-8" http-equiv="content-type">
+        <title>Camera Tracker</title>
+        <link type="text/css" rel="stylesheet" media="all" href="{{bootstrapCssURL}}">
+        <link type="text/css" rel="stylesheet" media="all" href="{{appCssURL}}">
+        <link rel="shortcut icon" href="{{faviconURL}}">
+        <script data-main="{{mainJsURL}}" src="{{requireJsURL}}" ></script>
+        <script>{{{jsLibsURLS}}}
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <h1>
+                <a href="{{siteIndexURL}}">Camera Tracker</a>
+            </h1>
+
+            {{{renderedView}}}
+
+            <div ng-view></div>
+        </div>
+    </body>
+</html>
+

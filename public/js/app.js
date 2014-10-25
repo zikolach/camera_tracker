@@ -2,9 +2,12 @@
 
 define([
 	'angular',
-	'controllers',
-	'angular-route',
-	], function (angular, controllers) {
+    'modules',
+	'controllers/index',
+	'controllers/camera',
+	'controllers/credits',
+	'angular-route'
+], function (angular) {
 
 		// Declare app level module which depends on filters, and services
 

@@ -1,13 +1,24 @@
 'use strict';
 
-define(['angular', 'app'], function(angular, app) {
+define([
+    'angular',
+    'app'
+], function(angular, app) {
 
 	return app.config(['$routeProvider', function($routeProvider) {
-		$routeProvider.when('/view1', {
-			templateUrl: 'partials/partial1.html',
-			controller: 'MyCtrl1'
+		$routeProvider.when('/', {
+			templateUrl: 'partials/index.html',
+			controller: 'IndexCtrl'
 		});
-		$routeProvider.otherwise({redirectTo: '/view1'});
+		$routeProvider.when('/camera', {
+			templateUrl: 'partials/camera.html',
+			controller: 'CameraCtrl'
+		});
+		$routeProvider.when('/credits', {
+			templateUrl: 'partials/credits.html',
+			controller: 'CreditsCtrl'
+		});
+		$routeProvider.otherwise({redirectTo: '/'});
 	}]);
 
 });
