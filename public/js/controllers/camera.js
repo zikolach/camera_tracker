@@ -53,11 +53,23 @@ define(['angular', 'jquery', 'underscore'], function (angular, $, _) {
                         captureTimer = null;
 
                     var drawFeatures = function(context) {
+                        // faces
                         context.beginPath();
                         _.each(scope.features.faces, function(face) {
                             context.rect(face.x, face.y, face.w, face.h);
                         });
                         context.strokeStyle = '#00ff00';
+                        context.stroke();
+                        // rects
+                        context.beginPath();
+                        _.each(scope.features.rects, function(rect) {
+                            context.moveTo(rect.a.x, rect.a.y);
+                            context.lineTo(rect.b.x, rect.b.y);
+                            context.lineTo(rect.c.x, rect.c.y);
+                            context.lineTo(rect.d.x, rect.d.y);
+                            context.lineTo(rect.a.x, rect.a.y);
+                        });
+                        context.strokeStyle = '#ff0000';
                         context.stroke();
                     };
 
