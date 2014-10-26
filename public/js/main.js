@@ -25,7 +25,8 @@
         'angular-route',
         'app',
         'routes',
-        'services'], function(angular) {
+        'services',
+        'modules'], function(angular) {
         angular.element(document).ready(function() {
             angular.bootstrap(document, ['myApp']);
         });

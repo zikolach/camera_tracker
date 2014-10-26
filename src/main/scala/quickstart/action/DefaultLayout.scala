@@ -26,7 +26,8 @@ trait DefaultLayout extends Action {
     at("faviconURL") = publicUrl("favicon.ico")
     at("appCssURL") = publicUrl("app.css")
     at("requireJsURL") = webJarsUrl("requirejs/2.1.14-3", "require.js", "require.min.js")
-    at("mainJsURL") = publicUrl("js/main.js")
+//    at("mainJsURL") = publicUrl("js/main.js")
+    at("mainJsURL") = "js/main.js"
     at("siteIndexURL") = url[SiteIndex]
     at("renderedView") = renderedView
     renderViewNoLayout[DefaultLayout]()

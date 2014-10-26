@@ -14,8 +14,8 @@ import scala.language.postfixOps
 case class CaptureMessage(timestamp: Long, image: String)
 
 case class FeaturesMessage(timestamp: Long,
-                           faces: List[Face],
-                           rects: List[RectDetector.Quadrangle])
+                           faces: Option[List[Face]],
+                           rects: Option[List[RectDetector.Quadrangle]])
 
 case class FeatureRequest(ts: Long, image: Mat)
 
@@ -53,10 +53,10 @@ class Detector extends SockJsAction {
         }
       case FacesResponse(ts: Long, faces) =>
         log.info(s"Detected faces - ${faces.length}")
-        respondSockJsJson(FeaturesMessage(ts, faces, List.empty))
+        respondSockJsJson(FeaturesMessage(ts, Some(faces), None))
       case QuadrangleResponse(ts: Long, rects: List[RectDetector.Quadrangle]) =>
         log.info(s"Detected rects - ${rects.length}")
-        respondSockJsJson(FeaturesMessage(ts, List.empty, rects))
+        respondSockJsJson(FeaturesMessage(ts, None, Some(rects)))
     }
   }
 

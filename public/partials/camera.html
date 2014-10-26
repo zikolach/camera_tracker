@@ -1,10 +1,6 @@
-<video id="v" class="hidden" width="320" height="240"></video>
+<hr/>
 <center>
-    <canvas id="c" class="mirror"></canvas>
-    <canvas id="o" class="mirror"></canvas>
-    <hr/>
-    <p id="fps"></p>
-
-    <button ng-click="send('aaa')">Send</button>
+    <capture timeout="33" on-capture="captureFrame" features="features"></capture>
 </center>
+<hr/>
 <a href="#/">Index</a>
