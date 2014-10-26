@@ -3,4 +3,15 @@
     <capture timeout="33" on-capture="captureFrame" features="features"></capture>
 </center>
 <hr/>
+<div class="checkbox">
+    <label>
+        <input type="checkbox" ng-model="detectRects"> Rects
+    </label>
+</div>
+<div class="checkbox">
+    <label>
+        <input type="checkbox" ng-model="detectFaces"> Faces
+    </label>
+</div>
+<p>Rects: {{features.rects.length}}</p>
 <a href="#/">Index</a>

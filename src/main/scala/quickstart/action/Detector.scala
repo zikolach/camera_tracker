@@ -1,17 +1,17 @@
 package quickstart.action
 
-import akka.actor.Props
 import org.opencv.core._
 import org.opencv.highgui.Highgui
-import quickstart.action.detectors.FaceDetector.{FacesResponse, Face}
+import quickstart.action.detectors.FaceDetector.{Face, FacesResponse}
 import quickstart.action.detectors.RectDetector.QuadrangleResponse
-import quickstart.action.detectors.{RectDetector, FaceDetector}
-import xitrum.util.SeriDeseri
-import xitrum.{SockJsText, SockJsAction}
+import quickstart.action.detectors.{FaceDetector, RectDetector}
 import xitrum.annotation.SOCKJS
+import xitrum.util.SeriDeseri
+import xitrum.{SockJsAction, SockJsText}
+
 import scala.language.postfixOps
 
-case class CaptureMessage(timestamp: Long, image: String)
+case class CaptureMessage(timestamp: Long, image: String, features: Option[Set[String]])
 
 case class FeaturesMessage(timestamp: Long,
                            faces: Option[List[Face]],
@@ -24,9 +24,9 @@ class Detector extends SockJsAction {
 
   val imageData = "data:image/([a-z]+);base64,(.*)".r
 
-  lazy val featureDetectors = List(
-    context.actorOf(FaceDetector.props, name = "faceDetector"),
-    context.actorOf(RectDetector.props, name = "rectDetector")
+  lazy val featureDetectors = Map(
+    "face" -> context.actorOf(FaceDetector.props, name = "faceDetector"),
+    "rect" -> context.actorOf(RectDetector.props, name = "rectDetector")
   )
 
   def execute() {
@@ -34,7 +34,7 @@ class Detector extends SockJsAction {
     context become {
       case SockJsText(text) =>
         SeriDeseri.fromJson[CaptureMessage](text) match {
-          case Some(CaptureMessage(ts, imgData)) =>
+          case Some(CaptureMessage(ts, imgData, features)) =>
             imgData match {
               case imageData(mimetype, data) =>
                 SeriDeseri.fromBase64(data) match {
@@ -43,7 +43,9 @@ class Detector extends SockJsAction {
                     val image = Highgui.imdecode(m, Highgui.IMREAD_COLOR)
                     val req = FeatureRequest(ts, image)
                     for (featureDetector <- featureDetectors) {
-                      featureDetector ! req
+                      if (features.isEmpty || features.exists(_.contains(featureDetector._1))) {
+                        featureDetector._2 ! req
+                      }
                     }
                   case _ =>
                 }

@@ -4,6 +4,8 @@ define(['angular', 'jquery', 'underscore'], function (angular, $, _) {
 
     return angular.module('myApp.controllers')
         .controller('CameraCtrl', ['$scope', 'detector', function ($scope, detector) {
+            $scope.detectFaces = true;
+            $scope.detectRects = true;
 
             var width = 0, height = 0, fps = 0, streaming = false,
                 faces = [], rects = [],
@@ -17,19 +19,33 @@ define(['angular', 'jquery', 'underscore'], function (angular, $, _) {
 
             var updateFeatures = function(data) {
                 $scope.$apply(function() {
-                    $scope.features.faces = data.faces || $scope.features.faces;
-                    $scope.features.rects = data.rects || $scope.features.rects;
-                    facesReceived = _.isArray(data.faces) || facesReceived;
-                    rectsReceived = _.isArray(data.rects) || rectsReceived;
-//                    console.log('faces - ' + facesReceived + ' rects ' + rectsReceived);
+                    if (_.isArray(data.faces) && !facesReceived) {
+                        facesReceived = true;
+                        $scope.features.faces = data.faces;
+                    }
+                    if (_.isArray(data.rects) || !rectsReceived) {
+                        rectsReceived = true;
+                        $scope.features.rects = data.rects;
+                    }
                 });
             };
 
             $scope.captureFrame = function(data) {
                 if (facesReceived && rectsReceived) {
-                    detector.send(data);
-                    facesReceived = false;
-                    rectsReceived = false;
+                    var features = [];
+                    if ($scope.detectFaces) {
+                        features.push('face');
+                        facesReceived = false;
+                    } else {
+                        $scope.features.faces = [];
+                    }
+                    if ($scope.detectRects) {
+                        features.push('rect');
+                        rectsReceived = false;
+                    } else {
+                        $scope.features.rects = [];
+                    }
+                    detector.send(data, features);
                 }
             };
 
@@ -69,7 +85,7 @@ define(['angular', 'jquery', 'underscore'], function (angular, $, _) {
                             context.lineTo(rect.d.x, rect.d.y);
                             context.lineTo(rect.a.x, rect.a.y);
                         });
-                        context.strokeStyle = '#ff0000';
+                        context.strokeStyle = '#0000ff';
                         context.stroke();
                     };
 
@@ -87,7 +103,6 @@ define(['angular', 'jquery', 'underscore'], function (angular, $, _) {
                         };
 
                     var adjustSize = function(v, c) {
-                        console.log('Adjusting size...');
                         if (!streaming) {
                             width = $(v).width();
                             if (v.videoWidth > 0) {
@@ -95,7 +110,6 @@ define(['angular', 'jquery', 'underscore'], function (angular, $, _) {
                             } else {
                                 height = $(v).height();
                             }
-                            console.log('width ' + width + ' height ' + height);
                             $(v).attr('width', width);
                             $(v).attr('height', height);
                             $(c).attr('width', width);
@@ -126,7 +140,6 @@ define(['angular', 'jquery', 'underscore'], function (angular, $, _) {
                                     captureTimer = $interval(function() {
                                         captureImage(v, c);
                                     }, timeout);
-                                    console.log(captureTimer);
                                 });
                                 v.play();
                             }, function(error) {
@@ -138,7 +151,6 @@ define(['angular', 'jquery', 'underscore'], function (angular, $, _) {
                     };
 
                     scope.$on('$destroy', function() {
-                        console.log("destroy");
                         localStream.stop();
                         if (!!captureTimer) {
                             $interval.cancel(captureTimer);

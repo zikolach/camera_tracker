@@ -13,6 +13,7 @@ object FaceDetector {
   case class Face(x: Int, y: Int, w: Int, h: Int)
   case class FacesResponse(ts: Long, faces: List[Face])
   lazy val props = Props[FaceDetector]
+  lazy val kind = "face"
 }
 
 class FaceDetector extends Actor {

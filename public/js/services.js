@@ -22,12 +22,13 @@ define(['angular', 'sockjs'], function(angular, SockJS) {
         connect();
 
         return {
-            send: function(data) {
+            send: function(data, features) {
                 if (!!sock) {
                     var ts = Date.now(),
                         buff = JSON.stringify({
                         timestamp: ts,
-                        image: data
+                        image: data,
+                        features: features
                     });
                     sock.send(buff);
                 }
