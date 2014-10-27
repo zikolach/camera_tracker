@@ -77,23 +77,25 @@ define(['angular', 'jquery', 'underscore'], function (angular, $, _) {
                         context.strokeStyle = '#00ff00';
                         context.stroke();
                         // rects
-                        context.beginPath();
+                        context.strokeStyle = '#0000ff';
+                        context.fillStyle = 'rgba(0, 0, 255, 0.2)';
                         _.each(scope.features.rects, function(rect) {
+                            context.beginPath();
                             context.moveTo(rect.a.x, rect.a.y);
                             context.lineTo(rect.b.x, rect.b.y);
                             context.lineTo(rect.c.x, rect.c.y);
                             context.lineTo(rect.d.x, rect.d.y);
-                            context.lineTo(rect.a.x, rect.a.y);
+                            context.closePath();
+                            context.fill();
+                            context.stroke();
                         });
-                        context.strokeStyle = '#0000ff';
-                        context.stroke();
                     };
 
                     var captureImage = function(v, capCtx) {
                             try {
                                 capCtx.drawImage(v, 0, 0, width, height);
-                                drawFeatures(capCtx);
                                 scope.onCapture(capCtx.canvas.toDataURL("image/jpeg", 0.5));
+                                drawFeatures(capCtx);
                             } catch (e) {
                                 // firefox bug - component not available
                                 console.log(e);

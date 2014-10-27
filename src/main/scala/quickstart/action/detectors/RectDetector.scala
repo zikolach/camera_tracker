@@ -2,14 +2,13 @@ package quickstart.action.detectors
 
 import java.util
 
-import akka.actor.{Props, Actor}
+import akka.actor.{Actor, Props}
 import org.opencv.core._
-import quickstart.action.FeatureRequest
-import quickstart.action.detectors.RectDetector.{QuadrangleResponse, Point, Quadrangle}
 import org.opencv.imgproc.Imgproc._
+import quickstart.action.FeatureRequest
+import quickstart.action.detectors.RectDetector.{Point, Quadrangle, QuadrangleResponse}
+
 import scala.collection.JavaConversions._
-
-
 import scala.language.postfixOps
 
 object RectDetector {
@@ -43,33 +42,53 @@ class RectDetector extends Actor {
 
   private def perimeter(curve: MatOfPoint2f): Double = Math.abs(arcLength(curve, true))
 
-  private def findCont(source: Mat): List[MatOfPoint] = {
+  private def findCont(gray: Mat): List[MatOfPoint] = {
+    val contours = new util.ArrayList[MatOfPoint]()
+    findContours(gray, contours, new Mat(), RETR_LIST, CHAIN_APPROX_SIMPLE)
+    contours.toList
+  }
+
+  private def findSquares(source: Mat): List[MatOfPoint] = {
     val thresh = 50
     val N = 10
+//    val pyr: Mat = new Mat(source.cols() / 2, source.rows() / 2, source.`type`())
     val timg: Mat = new Mat(source.size(), source.`type`())
     val gray0 = new Mat(source.size(), CvType.CV_8U)
     val gray = new Mat()
+    // reduce noise
     medianBlur(source, timg, 5)
+//    pyrDown(source, pyr, new Size(source.cols() / 2, source.rows() / 2))
+//    pyrUp(pyr, timg, source.size())
+    // find squares in every color plane of the image
     (0 to 2).map(c => {
       Core.mixChannels(List(timg), List(gray0), new MatOfInt(c, 0))
+      // try several threshold levels
       (0 to N).map (l => {
-        val contours = new util.ArrayList[MatOfPoint]()
+        // hack: use Canny instead of zero threshold level.
+        // Canny helps to catch squares with gradient shading
         if (l == 0) {
-          Canny(gray0, gray, 5, thresh)
+          // apply Canny. Take the upper threshold from slider
+          // and set the lower to 0 (which forces edges merging)
+          Canny(gray0, gray, 0, thresh)
+          // dilate canny output to remove potential
+          // holes between edge segments
           dilate(gray, gray, new Mat(), new org.opencv.core.Point(-1, -1), 1)
         } else {
+          // apply threshold if l!=0
           threshold(gray0, gray, (l + 1) * 255 / N, 255, THRESH_BINARY)
         }
-        findContours(gray, contours, new Mat(), RETR_LIST, CHAIN_APPROX_SIMPLE)
-        contours
+//        org.opencv.highgui.Highgui.imwrite(s"${new Date().getTime}.jpg", gray)
+        // find contours and store them all as a list
+        findCont(gray)
       })
     }).flatten.flatten.toList
   }
 
   override def receive = {
     case FeatureRequest(ts, image) =>
+      // restrict min rect size
       val minPerimeter = image.total() / 256
-      val squares = findCont(image).toList.map(contour =>
+      val squares = findSquares(image).toList.map(contour =>
         approximate(new MatOfPoint2f(contour.toArray:_*), 0.02)
       ).filter(approxCurve =>
         approxCurve.toList.length == 4 && perimeter(approxCurve) > minPerimeter && isConvex(approxCurve)
