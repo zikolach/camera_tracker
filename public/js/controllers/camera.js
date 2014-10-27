@@ -51,7 +51,7 @@ define(['angular', 'jquery', 'underscore'], function (angular, $, _) {
 
             detector.detect(updateFeatures);
         }])
-        .directive('capture', ['$interval', function($interval) {
+        .directive('capture', ['$timeout', function($timeout) {
             return {
                 restrict: 'E',
                 templateUrl: 'partials/capture.html',
@@ -62,9 +62,9 @@ define(['angular', 'jquery', 'underscore'], function (angular, $, _) {
                 },
                 link: function link(scope, element, attrs) {
 
-                    var width = 0, height = 0,
+                    var defaultTimeout = 33,
+                        width = 0, height = 0,
                         streaming = false,
-                        timeout = scope.timeout || 33,
                         localStream = null,
                         captureTimer = null;
 
@@ -89,17 +89,18 @@ define(['angular', 'jquery', 'underscore'], function (angular, $, _) {
                         context.stroke();
                     };
 
-                    var captureImage = function(v, c) {
+                    var captureImage = function(v, capCtx) {
                             try {
-                                var capCtx = c.getContext('2d');
                                 capCtx.drawImage(v, 0, 0, width, height);
                                 drawFeatures(capCtx);
-                                var data = c.toDataURL("image/jpeg", 0.5);
-                                scope.onCapture(data);
+                                scope.onCapture(capCtx.canvas.toDataURL("image/jpeg", 0.5));
                             } catch (e) {
                                 // firefox bug - component not available
                                 console.log(e);
                             }
+                            captureTimer = $timeout(function() {
+                                captureImage(v, capCtx);
+                            }, scope.timeout || defaultTimeout);
                         };
 
                     var adjustSize = function(v, c) {
@@ -137,9 +138,9 @@ define(['angular', 'jquery', 'underscore'], function (angular, $, _) {
                                 $(v).on('canplay', function() {
                                     adjustSize(v, c);
                                     streaming = true;
-                                    captureTimer = $interval(function() {
-                                        captureImage(v, c);
-                                    }, timeout);
+                                    captureTimer = $timeout(function() {
+                                        captureImage(v, c.getContext('2d'));
+                                    }, scope.timeout || defaultTimeout);
                                 });
                                 v.play();
                             }, function(error) {
@@ -153,7 +154,7 @@ define(['angular', 'jquery', 'underscore'], function (angular, $, _) {
                     scope.$on('$destroy', function() {
                         localStream.stop();
                         if (!!captureTimer) {
-                            $interval.cancel(captureTimer);
+                            $timeout.cancel(captureTimer);
                         }
                     });
 
