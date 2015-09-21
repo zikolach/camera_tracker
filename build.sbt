@@ -4,8 +4,7 @@ name         := "cam-track"
 
 version      := "1.0-SNAPSHOT"
 
-scalaVersion := "2.11.2"
-//scalaVersion := "2.10.4"
+scalaVersion := "2.11.7"
 
 scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked")
 
@@ -14,27 +13,26 @@ javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
 
 //------------------------------------------------------------------------------
 
-libraryDependencies += "tv.cntt" %% "xitrum" % "3.18"
+libraryDependencies += "tv.cntt" %% "xitrum" % "3.25.0"
 
 // Xitrum uses SLF4J, an implementation of SLF4J is needed
-libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.2"
+libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.3"
 //libraryDependencies += "org.slf4j" % "slf4j-simple" % "1.7.7"
 
 // For writing condition in logback.xml
-libraryDependencies += "org.codehaus.janino" % "janino" % "2.7.5"
-
-libraryDependencies += "org.webjars" % "bootstrap" % "3.2.0"
+libraryDependencies += "org.codehaus.janino" % "janino" % "2.7.8"
 
 // Scalate template engine config for Xitrum -----------------------------------
 
-libraryDependencies += "tv.cntt" %% "xitrum-scalate" % "2.2"
+libraryDependencies += "tv.cntt" %% "xitrum-scalate" % "2.5"
 
 libraryDependencies ++= Seq(
-  "org.webjars" % "requirejs" % "2.1.14-3",
-  "org.webjars" % "jquery" % "2.1.1",
-  "org.webjars" % "underscorejs" % "1.7.0",
-  "org.webjars" % "sockjs-client" % "0.3.4",
-  "org.webjars" % "angularjs" % "1.3.0"
+  "org.webjars" % "requirejs" % "2.1.20",
+  "org.webjars" % "jquery" % "2.1.4",
+  "org.webjars" % "underscorejs" % "1.8.3",
+  "org.webjars" % "sockjs-client" % "1.0.2",
+  "org.webjars" % "angularjs" % "1.4.4",
+  "org.webjars" % "bootstrap" % "3.3.5"
 )
 
 // Precompile Scalate templates
@@ -50,7 +48,7 @@ ScalateKeys.scalateTemplateConfig in Compile := Seq(TemplateConfig(
 
 autoCompilerPlugins := true
 
-addCompilerPlugin("tv.cntt" %% "xgettext" % "1.2")
+addCompilerPlugin("tv.cntt" %% "xgettext" % "1.3")
 
 scalacOptions += "-P:xgettext:xitrum.I18n"
 

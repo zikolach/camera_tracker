@@ -37,7 +37,7 @@ class Detector extends SockJsAction {
           case Some(CaptureMessage(ts, imgData, features)) =>
             imgData match {
               case imageData(mimetype, data) =>
-                SeriDeseri.fromBase64(data) match {
+                SeriDeseri.bytesFromBase64(data) match {
                   case Some(imageBytes) =>
                     val m = new MatOfByte(imageBytes: _*)
                     val image = Highgui.imdecode(m, Highgui.IMREAD_COLOR)
@@ -47,7 +47,7 @@ class Detector extends SockJsAction {
                         featureDetector._2 ! req
                       }
                     }
-                  case _ =>
+                  case a =>
                 }
             }
           case _ =>
