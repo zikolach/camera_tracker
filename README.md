@@ -10,6 +10,8 @@ cd build
 cmake -DBUILD_SHARED_LIBS=OFF ..
 make -j8
 ```
+Note that to make java bindings you need to have JAVA_HOME environment variable and ant installed.
+
 * Clone project repository
 ```
 git clone git@github.com:zikolach/camera_tracker.git
